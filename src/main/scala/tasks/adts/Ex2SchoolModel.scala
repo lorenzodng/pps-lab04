@@ -1,4 +1,5 @@
 package tasks.adts
+import u02.Modules.Person.Teacher
 import u03.extensionmethods.Optionals.*
 import u03.extensionmethods.Sequences.*
 
@@ -110,30 +111,61 @@ object SchoolModel:
        *
        */
       def hasCourse(name: String): Boolean
+
   object BasicSchoolModule extends SchoolModule:
-    override type School = Nothing
-    override type Teacher = Nothing
-    override type Course = Nothing
 
-    def teacher(name: String): Teacher = ???
-    def course(name: String): Course = ???
-    def emptySchool: School = ???
+    case class School(courses: Sequence[Course], teachers: Sequence[Teacher], teacherToCourses: Sequence[(Teacher, Course)])
+    case class Course(name: String)
+    case class Teacher(name: String)
 
+    def teacher(name: String): Teacher = Teacher(name)
+    def course(name: String): Course = Course(name)
+    def emptySchool: School = School(Sequence.Nil(), Sequence.Nil(), Sequence.Nil())
     extension (school: School)
-      def courses: Sequence[String] = ???
-      def teachers: Sequence[String] = ???
-      def setTeacherToCourse(teacher: Teacher, course: Course): School = ???
-      def coursesOfATeacher(teacher: Teacher): Sequence[Course] = ???
-      def hasTeacher(name: String): Boolean = ???
-      def hasCourse(name: String): Boolean = ???
+      def courses: Sequence[String] = Sequence.map(school.courses)(course => course match
+        case Course(name) => name
+      )
+
+      def teachers: Sequence[String] = Sequence.map(school.teachers)(teacher => teacher match
+        case Teacher(name) => name
+      )
+
+      def setTeacherToCourse(teacher: Teacher, course: Course): School = School(Sequence.Cons(course, Sequence.Nil()), Sequence.Cons(teacher, Sequence.Nil()), Sequence.Cons((teacher, course), Sequence.Nil()))
+
+      def coursesOfATeacher(teacher: Teacher): Sequence[Course] = Sequence.map(Sequence.filter(school.teacherToCourses)(teacher => teacher match
+        case teacher => true
+        case _ => false
+      ))(teacher_course => teacher_course match
+        case (Teacher(_), Course(name)) => Course(name)
+      )
+
+      def hasTeacher(name: String): Boolean = Sequence.filter(school.teacherToCourses)(teacher_course => teacher_course match
+        case (Teacher(name), Course(_)) => true
+        case _ => false
+      ) match
+        case _ => true
+        case Sequence.Nil() => false
+
+      def hasCourse(name: String): Boolean = Sequence.filter(school.teacherToCourses)(teacher_course => teacher_course match
+        case (Teacher(_), Course(name)) => true
+        case _ => false
+      ) match
+        case _ => true 
+        case Sequence.Nil() => false
+
+
+
 @main def examples(): Unit =
   import SchoolModel.BasicSchoolModule.*
   val school = emptySchool
   println(school.teachers) // Nil()
   println(school.courses) // Nil()
+
+
   println(school.hasTeacher("John")) // false
   println(school.hasCourse("Math")) // false
-  val john = teacher("John")
+
+  /*val john = teacher("John")
   val math = course("Math")
   val italian = course("Italian")
   val school2 = school.setTeacherToCourse(john, math)
@@ -149,5 +181,5 @@ object SchoolModel:
   println(school3.hasCourse("Math")) // true
   println(school3.hasCourse("Italian")) // true
   println(school3.coursesOfATeacher(john)) // Cons("Math", Cons("Italian", Nil()))
-
+*/
 
