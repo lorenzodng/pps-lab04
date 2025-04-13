@@ -32,7 +32,6 @@ object Ex4Summables:
 
   def sumAll[A: Summable](seq: Sequence[A]) =
     val summable = summon[Summable[A]]
-    @tailrec
     def sumLoop(acc: A, seq: Sequence[A]): A = seq match
       case Nil() => acc
       case Cons(head, tail) => summable.sum(summable.sum(head, acc), sumLoop(acc, tail))
