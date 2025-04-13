@@ -18,11 +18,13 @@ object Ex1ComplexNumbers:
       def asString(): String
 
   object BasicComplexADT extends ComplexADT:
+    
     case class Complex(re: Double, im: Double)
     
     def complex(re: Double, im: Double): Complex = Complex(re, im)
 
     extension (complex: Complex)
+      
       def re(): Double = complex.re
       def im(): Double = complex.im
       def sum(other: Complex): Complex = Complex(complex.re + other.re, complex.im + other.im)

@@ -29,7 +29,7 @@ object Sequences: // Essentially, generic linkedlists
       case Nil()      => false
 
 @main def trySequences =
-  import Sequences.* 
+  import Sequences.*
   val l = Sequence.Cons(10, Sequence.Cons(20, Sequence.Cons(30, Sequence.Nil())))
   println(Sequence.sum(l)) // 30
 

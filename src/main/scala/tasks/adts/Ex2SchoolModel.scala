@@ -1,7 +1,6 @@
 package tasks.adts
-import u02.Modules.Person.Teacher
-import u03.extensionmethods.Optionals.*
-import u03.extensionmethods.Sequences.*
+import tasks.adts.SchoolModel.BasicSchoolModule
+import u03.Sequences.*
 
 /*  Exercise 2: 
  *  Implement the below trait, and write a meaningful test.
@@ -114,25 +113,35 @@ object SchoolModel:
 
   object BasicSchoolModule extends SchoolModule:
 
-    case class School(courses: Sequence[Course], teachers: Sequence[Teacher], teacherToCourses: Sequence[(Teacher, Course)])
+    case class School(courses_school: Sequence[Course], teachers_school: Sequence[Teacher], teacherToCourses: Sequence[(Teacher, Course)])
     case class Course(name: String)
     case class Teacher(name: String)
 
     def teacher(name: String): Teacher = Teacher(name)
     def course(name: String): Course = Course(name)
     def emptySchool: School = School(Sequence.Nil(), Sequence.Nil(), Sequence.Nil())
+
     extension (school: School)
-      def courses: Sequence[String] = Sequence.map(school.courses)(course => course match
+
+      def removeDuplicates(names: Sequence[String])(seen: Sequence[String]): Sequence[String] = names match
+        case Sequence.Cons(head, tail) =>
+          if Sequence.contains(seen)(head) then
+            removeDuplicates(tail)(seen)
+          else
+            Sequence.Cons(head, removeDuplicates(tail)(Sequence.Cons(head, seen)))
+        case _ => Sequence.Nil()
+
+      def courses: Sequence[String] = removeDuplicates(Sequence.map(school.courses_school)(course => course match
         case Course(name) => name
-      )
+      ))(Sequence.Nil())
 
-      def teachers: Sequence[String] = Sequence.map(school.teachers)(teacher => teacher match
+      def teachers: Sequence[String] = removeDuplicates(Sequence.map(school.teachers_school)(teacher => teacher match
         case Teacher(name) => name
-      )
+      ))(Sequence.Nil())
 
-      def setTeacherToCourse(teacher: Teacher, course: Course): School = School(Sequence.Cons(course, Sequence.Nil()), Sequence.Cons(teacher, Sequence.Nil()), Sequence.Cons((teacher, course), Sequence.Nil()))
+      def setTeacherToCourse(teacher: Teacher, course: Course): School = School(Sequence.Cons(course, school.courses_school), Sequence.Cons(teacher, school.teachers_school), Sequence.Cons((teacher, course), school.teacherToCourses))
 
-      def coursesOfATeacher(teacher: Teacher): Sequence[Course] = Sequence.map(Sequence.filter(school.teacherToCourses)(teacher => teacher match
+      def coursesOfATeacher(teacher: Teacher): Sequence[Course] = Sequence.map(Sequence.filter(school.teacherToCourses)(teacher_course => teacher_course match
         case teacher => true
         case _ => false
       ))(teacher_course => teacher_course match
@@ -140,32 +149,26 @@ object SchoolModel:
       )
 
       def hasTeacher(name: String): Boolean = Sequence.filter(school.teacherToCourses)(teacher_course => teacher_course match
-        case (Teacher(name), Course(_)) => true
+        case (Teacher(teacher_name), Course(_)) if teacher_name == name => true
         case _ => false
       ) match
-        case _ => true
         case Sequence.Nil() => false
+        case _ => true
 
       def hasCourse(name: String): Boolean = Sequence.filter(school.teacherToCourses)(teacher_course => teacher_course match
-        case (Teacher(_), Course(name)) => true
+        case (Teacher(_), Course(course_name)) if course_name == name => true
         case _ => false
       ) match
-        case _ => true 
         case Sequence.Nil() => false
-
+        case _ => true
 
 
 @main def examples(): Unit =
   import SchoolModel.BasicSchoolModule.*
+
   val school = emptySchool
-  println(school.teachers) // Nil()
-  println(school.courses) // Nil()
 
-
-  println(school.hasTeacher("John")) // false
-  println(school.hasCourse("Math")) // false
-
-  /*val john = teacher("John")
+  val john = teacher("John")
   val math = course("Math")
   val italian = course("Italian")
   val school2 = school.setTeacherToCourse(john, math)
@@ -175,11 +178,10 @@ object SchoolModel:
   println(school2.hasCourse("Math")) // true
   println(school2.hasCourse("Italian")) // false
   val school3 = school2.setTeacherToCourse(john, italian)
-  println(school3.teachers) // Cons("John", Nil())
+  println(school3.teachers)
   println(school3.courses) // Cons("Math", Cons("Italian", Nil()))
   println(school3.hasTeacher("John")) // true
   println(school3.hasCourse("Math")) // true
   println(school3.hasCourse("Italian")) // true
-  println(school3.coursesOfATeacher(john)) // Cons("Math", Cons("Italian", Nil()))
-*/
+  println(school3.coursesOfATeacher(john)) // Cons("Math", Cons("Italian", Nil()))*/
 

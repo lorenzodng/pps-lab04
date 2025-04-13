@@ -33,8 +33,7 @@ object Sequences:
       def concat(other: Sequence[A]): Sequence[A] = l match
         case Cons(h, t) => Cons(h, t.concat(other))
         case Nil()      => other
-
-
+    
     def of[A](n: Int, a: A): Sequence[A] =
       if (n == 0) then Nil[A]() else Cons(a, of(n - 1, a))
 

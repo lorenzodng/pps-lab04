@@ -1,5 +1,5 @@
 package u04lab
-import u03.Sequences.* 
+import u03.Sequences.*
 import Sequence.*
 
 /*  Exercise 4: 
@@ -17,34 +17,42 @@ object Ex4Summables:
   trait Summable[A]:
     def sum(a1: A, a2: A): A
     def zero: A
-
-  def sumAll[A: Summable](seq: Sequence[A]) =
-    val summable = summon[Summable[A]]
-    ???  // complete here
-
+  
   given Summable[Int] with
     def sum(a1: Int, a2: Int): Int = a1 + a2
     def zero: Int = 0
+
+  given Summable[Double] with
+    def sum(a1: Double, a2: Double): Double = a1 + a2
+    def zero: Double = 0
+
+  given Summable[String] with
+     def sum(a1: String, a2: String): String = a1 + a2
+     def zero: String = ""
+
+  def sumAll[A: Summable](seq: Sequence[A]) =
+    val summable = summon[Summable[A]]
+    def sumLoop(acc: A, seq: Sequence[A]): A = seq match
+      case Nil() => acc
+      case Cons(head, tail) => summable.sum(summable.sum(head, acc), sumLoop(acc, tail))
+
+    sumLoop(summable.zero, seq)
+    
+@main def trySummables =
+  import u04lab.Ex4Summables.{sumAll, sumAllInt}
   
-  // write givens for Summable[Double] and Summable[String]
+  val si = Cons(10, Cons(20, Cons(30, Nil())))
+  println:
+    sumAllInt(si) // 60
 
-  @main def trySummables =
-    val si = Cons(10, Cons(20, Cons(30, Nil())))  
-    println:
-      sumAllInt(si) // 60
+  println:
+    sumAll(si) // 60
 
-    /* uncomment from here   
+  val sd = Cons(10.0, Cons(20.0, Cons(30.0, Nil())))
+  println:
+    sumAll(sd) // 60.0
 
-    println:
-      sumAll(si) // 60
-
-    val sd = Cons(10.0, Cons(20.0, Cons(30.0, Nil())))  
-    println:
-      sumAll(sd) // 60.0
-
-    val ss = Cons("10", Cons("20", Cons("30", Nil())))  
-    println:
-      sumAll(ss) // "102030"
-
-    */  
+  val ss = Cons("10", Cons("20", Cons("30", Nil())))
+  println:
+    sumAll(ss) // "102030"
 
