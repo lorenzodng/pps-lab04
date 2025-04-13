@@ -30,8 +30,7 @@ object Ex4Summables:
      def sum(a1: String, a2: String): String = a1 + a2
      def zero: String = ""
 
-  def sumAll[A: Summable](seq: Sequence[A]) =
-    val summable = summon[Summable[A]]
+  def sumAll(seq: Sequence[A])(using summable: Summable[A]) =
     def sumLoop(acc: A, seq: Sequence[A]): A = seq match
       case Nil() => acc
       case Cons(head, tail) => summable.sum(summable.sum(head, acc), sumLoop(acc, tail))
