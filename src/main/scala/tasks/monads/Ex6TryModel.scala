@@ -13,6 +13,8 @@ import u04.monads.Monads.Monad
       - in case of Failure, it should return the exception (fail fast)
     - Verify that the main works as expected
   */
+
+//esempio di utilizzo di una monade
 object Ex6TryModel:
   private enum TryImpl[A]:
     case Success(value: A)
@@ -23,26 +25,31 @@ object Ex6TryModel:
   def success[A](value: A): Try[A] = TryImpl.Success(value)
   def failure[A](exception: Throwable): Try[A] = TryImpl.Failure(exception)
 
-  extension [A](m: Try[A]) 
-    
+  //per definire una monade, è necessario introdurre due metodi principali: unit e flatMap, utilizzati per il for-yield
+  given Monad[Try] with
+
+    //inserisce un valore nella monade (ovvero tra for e yield)
+    override def unit[A](value: A): Try[A] = TryImpl.Success(value)
+
+    extension [A](m: Try[A])
+
+      //gestisce l'esecuzione di un'operazione richiamata sugli elementi della monade
+      override def flatMap[B](f: A => Try[B]): Try[B] = m match
+        case TryImpl.Success(value) => f(value) //esegue la funzione
+        case TryImpl.Failure(exception) => exception.printStackTrace(); TryImpl.Failure(exception) //stampo un'eccezione
+
+  extension [A](m: Try[A])
+
+    //metodo utile per la verifica dell'esecuzione della monade tramite assert (non strettamente utile in questo contesto)
     def getOrElse[B >: A](other: B): B = m match
       case TryImpl.Success(value) => value
       case TryImpl.Failure(_) => other
 
-  given Monad[Try] with
-    override def unit[A](value: A): Try[A] = TryImpl.Success(value)
 
-    extension [A](m: Try[A])
-      
-      override def flatMap[B](f: A => Try[B]): Try[B] = m match
-        case TryImpl.Success(value) => f(value)
-        case TryImpl.Failure(exception) => exception.printStackTrace(); TryImpl.Failure(exception)
-
-
-@main def main: Unit = 
+@main def main: Unit =
   import Ex6TryModel.*
 
-  val result = for 
+  val result = for
     a <- success(10)
     b <- success(30)
   yield a + b

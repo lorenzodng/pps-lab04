@@ -19,30 +19,35 @@ import Optional.*
 
 object Ex5Traversable:
 
-  trait Traversable[T[_]]:
+  //esempio di utilizzo di trait con given
+  trait Traversable[T[_]]: //T[_] è un "costruttore"
     def traverse[A](t: T[A])(f: A => Unit): Unit
 
+  //definisco un'implementazione personalizzata del trait per sequenze
   given Traversable[Sequence] with
     def traverse[A](t: Sequence[A])(f: A => Unit): Unit = t match
       case Cons(head, tail) => f(head); traverse(tail)(f)
       case _ => ()
 
+  //definisco un'implementazione personalizzata del trait per optional
   given Traversable[Optional] with
     def traverse[A](t: Optional[A])(f: A => Unit): Unit = t match
       case Just(head) => f(head)
       case _ => ()
 
-  def logAll[A, T[_]](t: T[A])(f: A => Unit)(using traversable: Traversable[T]): Unit =
-    summon[Traversable[T]].traverse(t)(f)
+  //metodo di esecuzione
+  def logAll[A, T[_]](t: T[A])(f: A => Unit)(using traversable: Traversable[T]): Unit = //using è utilizzato per ottenere l'istanza dei Traversable implementati con given
+    traversable.traverse(t)(f)  //ogni volta che viene richiamato questo metodo, a seconda del tipo passato come parametro, viene eseguita una delle implementazioni del trait
+
 
 @main def main =
   import u04lab.Ex5Traversable.logAll
-  
+
   val si = Cons(10, Cons(20, Cons(30, Nil())))
   def log(a: Int): Unit = println("The next value is: " + a)
   println:
     logAll(si)(log)
- 
+
 
 
   

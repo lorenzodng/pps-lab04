@@ -7,9 +7,11 @@ package tasks.adts
 
 object Ex1ComplexNumbers:
 
+  //esempio di utilizzo di un trait
   trait ComplexADT:
     type Complex
     def complex(re: Double, im: Double): Complex
+    
     extension (complex: Complex)
       def re(): Double
       def im(): Double
