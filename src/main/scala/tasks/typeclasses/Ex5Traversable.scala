@@ -33,7 +33,7 @@ object Ex5Traversable:
       case _ => ()
 
   def logAll[A, T[_]](t: T[A])(f: A => Unit)(using traversable: Traversable[T]): Unit =
-    summon[Traversable[T]].traverse(t)(f)
+    traversable.traverse(t)(f)
 
 @main def main =
   import u04lab.Ex5Traversable.logAll
