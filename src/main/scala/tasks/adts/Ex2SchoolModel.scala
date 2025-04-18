@@ -114,7 +114,7 @@ object SchoolModel:
 
   object BasicSchoolModule extends SchoolModule:
 
-    case class School(courses_school: Sequence[Course], teachers_school: Sequence[Teacher], teacherToCourses: Sequence[(Teacher, Course)])
+    case class School(coursesSchool: Sequence[Course], teachersSchool: Sequence[Teacher], teacherToCourses: Sequence[(Teacher, Course)])
     case class Course(name: String)
     case class Teacher(name: String)
 
@@ -133,15 +133,15 @@ object SchoolModel:
             Sequence.Cons(head, removeDuplicates(tail)(Sequence.Cons(head, seen)))
         case _ => Sequence.Nil()
 
-      def courses: Sequence[String] = removeDuplicates(Sequence.map(school.courses_school)(course => course match
+      def courses: Sequence[String] = removeDuplicates(Sequence.map(school.coursesSchool)(course => course match
         case Course(name) => name
       ))(Sequence.Nil())
 
-      def teachers: Sequence[String] = removeDuplicates(Sequence.map(school.teachers_school)(teacher => teacher match
+      def teachers: Sequence[String] = removeDuplicates(Sequence.map(school.teachersSchool)(teacher => teacher match
         case Teacher(name) => name
       ))(Sequence.Nil())
 
-      def setTeacherToCourse(teacher: Teacher, course: Course): School = School(Sequence.Cons(course, school.courses_school), Sequence.Cons(teacher, school.teachers_school), Sequence.Cons((teacher, course), school.teacherToCourses))
+      def setTeacherToCourse(teacher: Teacher, course: Course): School = School(Sequence.Cons(course, school.coursesSchool), Sequence.Cons(teacher, school.teachersSchool), Sequence.Cons((teacher, course), school.teacherToCourses))
 
       //metodo per restituire tutti i corsi di un'insegnante 
       def coursesOfATeacher(teacher: Teacher): Sequence[Course] = Sequence.map(Sequence.filter(school.teacherToCourses)(teacher_course => teacher_course match //map(filter) corrisponde a dire: trasformo per ottenere un valore di interesse(a partire da una lista filtrata)
