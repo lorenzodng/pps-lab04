@@ -14,7 +14,6 @@ import u04.monads.Monads.Monad
     - Verify that the main works as expected
   */
 
-//esempio di utilizzo di una monade
 object Ex6TryModel:
   private enum TryImpl[A]:
     case Success(value: A)
@@ -25,22 +24,18 @@ object Ex6TryModel:
   def success[A](value: A): Try[A] = TryImpl.Success(value)
   def failure[A](exception: Throwable): Try[A] = TryImpl.Failure(exception)
 
-  //per definire una monade, è necessario introdurre due metodi principali: unit e flatMap, utilizzati per il for-yield
   given Monad[Try] with
 
-    //inserisce un valore nella monade (ovvero tra for e yield)
     override def unit[A](value: A): Try[A] = TryImpl.Success(value)
 
     extension [A](m: Try[A])
 
-      //gestisce l'esecuzione di un'operazione richiamata sugli elementi della monade
       override def flatMap[B](f: A => Try[B]): Try[B] = m match
-        case TryImpl.Success(value) => f(value) //esegue la funzione
-        case TryImpl.Failure(exception) => exception.printStackTrace(); TryImpl.Failure(exception) //stampo un'eccezione
+        case TryImpl.Success(value) => f(value)
+        case TryImpl.Failure(exception) => exception.printStackTrace(); TryImpl.Failure(exception)
 
   extension [A](m: Try[A])
 
-    //metodo utile per la verifica dell'esecuzione della monade tramite assert (non strettamente utile in questo contesto)
     def getOrElse[B >: A](other: B): B = m match
       case TryImpl.Success(value) => value
       case TryImpl.Failure(_) => other
