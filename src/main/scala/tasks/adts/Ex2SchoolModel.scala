@@ -10,7 +10,6 @@ import u03.Sequences.*
  */
 object SchoolModel:
 
-  //esempio di utilizzo di un trait
   trait SchoolModule:
     type School
     type Teacher
@@ -124,10 +123,9 @@ object SchoolModel:
 
     extension (school: School)
 
-      //metodo per rimuovere eventuali duplicati per i corsi e per gli insegnanti
       def removeDuplicates(names: Sequence[String])(seen: Sequence[String]): Sequence[String] = names match
         case Sequence.Cons(head, tail) =>
-          if Sequence.contains(seen)(head) then  //contains è un metodo già definito in Sequences
+          if Sequence.contains(seen)(head) then 
             removeDuplicates(tail)(seen)
           else
             Sequence.Cons(head, removeDuplicates(tail)(Sequence.Cons(head, seen)))
@@ -143,8 +141,7 @@ object SchoolModel:
 
       def setTeacherToCourse(teacher: Teacher, course: Course): School = School(Sequence.Cons(course, school.coursesSchool), Sequence.Cons(teacher, school.teachersSchool), Sequence.Cons((teacher, course), school.teacherToCourses))
 
-      //metodo per restituire tutti i corsi di un'insegnante 
-      def coursesOfATeacher(teacher: Teacher): Sequence[Course] = Sequence.map(Sequence.filter(school.teacherToCourses)(teacher_course => teacher_course match //map(filter) corrisponde a dire: trasformo per ottenere un valore di interesse(a partire da una lista filtrata)
+      def coursesOfATeacher(teacher: Teacher): Sequence[Course] = Sequence.map(Sequence.filter(school.teacherToCourses)(teacher_course => teacher_course match
         case teacher => true
         case _ => false))(teacher_course => teacher_course match
         case (Teacher(_), Course(name)) => Course(name)
