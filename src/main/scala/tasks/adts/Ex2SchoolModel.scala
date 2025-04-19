@@ -175,7 +175,6 @@ object SchoolModel:
   println(school2.hasCourse("Math")) // true
   println(school2.hasCourse("Italian")) // false
   val school3 = school2.setTeacherToCourse(john, italian)
-  println(school3.teachers)
   println(school3.courses) // Cons("Math", Cons("Italian", Nil()))
   println(school3.hasTeacher("John")) // true
   println(school3.hasCourse("Math")) // true
